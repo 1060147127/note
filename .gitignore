@@ -1,0 +1,9 @@
+﻿# secrets & junk
+.env
+.env.*
+*.pem
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/
+.venv/
