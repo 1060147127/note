@@ -1,9 +1,14 @@
 ﻿# secrets & junk
 .env
-.env.*
+.env.local
+.env.*.local
 *.pem
 .DS_Store
 Thumbs.db
 node_modules/
 __pycache__/
 .venv/
+.next/
+storage/
+**/prisma/*.db
+**/prisma/*.db-journal
