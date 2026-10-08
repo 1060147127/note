@@ -43,6 +43,8 @@
             - CodeBuddy
         - 快手
             - KAT-Coder-Pro
+        - deepseek
+            - dsh
 
 
 - 垂直llm

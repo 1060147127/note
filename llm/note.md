@@ -4,6 +4,31 @@
   - 
 
 # 模型
+
+## 价格
+
+单位：USD / 百万 Token（$/MTok）。下表取**标准 API 标价**（非缓存、非 Batch）；缓存命中、长上下文加价、高峰/促销另注。笔记内模型优先，便于横向比。
+
+| 档 | 厂商 | 模型 | 输入 | 输出 | 备注 |
+|---|---|---|---:|---:|---|
+| 极便宜 | DeepSeek | V4.1-Flash | 0.15 | 0.60 | 非高峰；高峰约 2×（0.30 / 1.20）；缓存命中可到 ~0.003 |
+| 便宜 | Mistral | Large 4 | 0.68 | 2.09 | 文档促销价；原价约 1.36 / 4.18 |
+| 便宜 | OpenAI | GPT-5.6 Luna | 1 | 6 | 性价比档 |
+| 中档 | SpaceXAI | Grok 4.7 | 2 | 6 | 同 4.6；prompt≥200k → 4 / 12；Fast 约 2× |
+| 中档 | OpenAI | GPT-5.6 Terra | 2.5 | 15 | 日常档 |
+| 中高 | Anthropic | Opus 5.5 | 4 | 20 | 缓存读 0.20；Fast mode 8 / 40 |
+| 中高 | OpenAI | GPT-5.6 Sol | 5 | 30 | 稿内标价；有来源称促销曾 4 / 20 |
+| 贵价 | OpenAI | GPT-6 Astra | 10 | 50 | 约 2× Sol |
+| 贵价 | Anthropic | Fable 5.1 | 10 | 50 | 标准价未降；缓存读 1→0.25，Agent 综合成本可明显下降 |
+
+**一眼比（同量级）**
+
+- 输出价：Flash（0.6）≪ Large4 / Luna / Grok（6）≪ Opus5.5 / Sol（20–30）≪ Astra / Fable（50）
+- 旗舰性价比叙事：Grok 4.7 约等于贵价旗舰输出价的 1/8～1/3；DeepSeek Flash 再低一个数量级
+- 比单价不够：Agent 长任务看**缓存命中率 + 输出 Token 量**；Fable/Opus 常靠缓存把「任务总成本」压下来
+
+来源：各模型条目内标价 + [xAI Pricing](https://docs.x.ai/developers/pricing) / [DeepSeek Pricing](https://api-docs.deepseek.com/quick_start/pricing) / Mistral docs；以官方页为准，促销会变。
+
 ## 国际
 ### SpaceXAI
 #### Grok 4.7：260922
@@ -177,9 +202,28 @@
 - 强项：Terminal-Bench 4.0、CursorBench、GDPval、OSWorld、数小时 Agent  
 - 短板：部分自动化/科学终端仍逊 Astra；max 档 Token 消耗可能仍高  
 
+### 法国
+#### Mistral
+
+
 ## 国内
 ### 深度求索
-#### DeepSeek-V4.1-Flash：260910
+#### 260930：deepseek一次性开源了面向华为昇腾平台的六大基础设施组件：TileLang、DeepGEMM、DeepEP、TileKernels、FlashMLA、DeepSelect
+
+| 层级 | 英伟达生态 | 国产华为昇腾 | 简单概要 |
+|---|---|---|---|
+| 算子 DSL | CUDA | TileLang（昇腾版） | 用简单写法，写出能跑满硬件性能的算子 |
+| 通用算子库 | cuBLAS | DeepGEMM | AI 里最核心的“乘法”怎么算最快 |
+| 通信库 | NCCL | DeepEP | 几百张卡之间怎么“说话”不堵车 |
+| 注意力算子 | FlashAttention | FlashMLA | 超长文本处理更省更快 |
+| 向量/访存算子 | CUTLASS | TileKernels | 数据搬进搬出、常规处理 |
+| 数据管线 | DALI等 | DeepSelect | 从海量数据里快速挑出要用的 |
+
+两个关键点：
+  - 1. 传统依赖于英伟达CUDA，现在deepseek证明了在国产芯片上也能训练出llm。
+  - 2. CUDA就是告诉芯片该怎么干，但没有东西告诉国产芯片该怎么干
+
+#### 260910：DeepSeek-V4.1-Flash
 
 来源：官方对比表（蓝框列为该模型）。跨行勿比绝对分；Codeforces 为 Elo，其余多为准确率/%。`*` = 仅 HLE 纯文本子集。
 
@@ -211,6 +255,37 @@
 - 编程：竞赛与 Terminal 2.1 / SWE 强；ProgramBench、Terminal 3/4 一般  
 - 推理与 Agent：工具链有增益；纯自主 Agent、Exploit 类仍是短板  
 
+#### deepseek能力
+  - 1. 核心文本和推理能力
+    - 1. 超长上下文
+      - 1M tokens上下文
+    - 2. 顶尖推理与知识
+    - 3. 灵活思考
+      - 支持low/high/max三档思考强度，可根据任务复杂度灵活切换
+  - 2. 多模态视觉理解
+  - 3. 强大的agent与代码能力
+  - 4. 开发与接入能力，关键API能力
+    - 1. 多格式输入
+      - 1. 原生支持
+        - 图片
+          - 支持的格式：JPEG、PNG、GIF、WebP
+          - 能干什么：描述画面、读取截图文字、分析图表
+          - 传入方式：base64 内联、外部 URL、Files API 上传后引用 file_id 都可以
+      - 2. 后处理：可能会出现格式丢失
+        - pdf
+        - word
+        - excel
+        - csv/TXT/Markdown
+    - 2. 成本优化
+    - 3. Agent与工具调用（Tool calls）：API原生支持Function Calling
+    - 4. 结构化输出
+    - 5. 思考模式控制
+    - 6. 多协议兼容
+    - 7. 多模态输入
+      - deepseek-flash不支持视觉，但可以通过deepseek-v4-flash-vision-exp这个实验模型在API中处理图片
+    - 8. 成本与接入
+      - 定价策略
+      - 输入方式
 # 数据集
 
 > 下列多为评测基准（benchmark），不是训练语料。同一行比模型；跨行勿直接比绝对分（准确率 / Elo 等量纲不同）。`*` 常表示仅测 HLE 纯文本子集。
